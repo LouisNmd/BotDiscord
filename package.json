@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/kai63001/discord-bot-music#readme",
   "dependencies": {
+    "ts-node": "10.9.1",
     "@discordjs/voice": "^0.7.5",
     "axios": "^0.24.0",
     "discord.js": "^13.3.1",
