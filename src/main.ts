@@ -4,6 +4,7 @@ import {
   disconnect as dis,
   play,
   joinServer,
+  playSelectedSound,
 } from "@components/lib";
 import {helpMePls} from "@components/message"
 require("dotenv").config();
@@ -23,17 +24,24 @@ client.on("messageCreate", async (msg: any) => {
     case msg.content == "!join":
       joinServer(msg);
       break;
+
     case msg.content == "!disconnect":
       dis();
       break;
+
     case msg.content.indexOf("!play") == 0:
-      const letplay = play(msg);
+      play(msg);
       break;
+
     case msg.content == "!!help":
       helpMePls(msg);
+      break;
+
+    case (!isNaN(msg.content) && msg.content.trim()!=""):
+      playSelectedSound(msg);
+      break;
 
     default:
-      console.log("aled");
       break;
   }
 });
