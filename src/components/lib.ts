@@ -20,7 +20,7 @@ let _connection: any;
 const player = createAudioPlayer();
 const NUMBER_OF_RESULT = 5;
 var CURRENTLY_SEARCHING = false;
-var RESULTS: Root;
+var RESULTS: Root | undefined;
 
 const client = () => {
   return new Client({
@@ -51,6 +51,8 @@ const joinServer = (msg: any) => {
 };
 
 const disconnect = () => {
+  RESULTS = undefined;
+  CURRENTLY_SEARCHING = false;
   _connection.destroy();
   _connection = undefined;
 };
@@ -89,12 +91,14 @@ const play = async (msg: any) => {
 const playSelectedSound = async (msg: any) => {
   const index: number = parseInt(msg.content);
   if(CURRENTLY_SEARCHING &&  index >= 1 && index <= NUMBER_OF_RESULT) {
-    const videoToPlay: Item = RESULTS.items[index-1];
+    const videoToPlay: Item = RESULTS!.items[index-1];
     const path = await playYoutubeFromURL(videoURL.concat(videoToPlay.id.videoId));
     const resource = await createAudioResource(path[1].url);
     player.play(resource);
     messagePlaying(msg, videoToPlay); //send message
     const subscribe = _connection.subscribe(player);
+    RESULTS = undefined;
+    CURRENTLY_SEARCHING = false;
   }
   return;
 }
