@@ -75,9 +75,9 @@ const play = async (msg: any) => {
       //console.log(searched);
       const path = await playYoutubeFromCommand(msg);
       const resource = await createAudioResource(path[1].url);
-      //player.play(resource);
-      messagePlaying(msg, searched.item[0]); //send message
-      //const subscribe = _connection.subscribe(player);
+      player.play(resource);
+      messagePlaying(msg, searched.items[0]); //send message
+      const subscribe = _connection.subscribe(player);
     } else {
       // Cas d'une recherche par mot clé
       RESULTS = await getSearchResults(NUMBER_OF_RESULT, msg);
