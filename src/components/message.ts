@@ -1,15 +1,32 @@
 import { MessageEmbed } from "discord.js";
+import { mapYoutubeSearchToResult } from "src/model/mapper";
+import { Item, Root } from "src/model/youtube/searchData";
 
-const messagePlaying = (msg: any, searched: any) => {
+const messagePlaying = (msg: any, searched: Item) => {
   const user = msg.mentions.users.first() || msg.author;
   const embed = new MessageEmbed()
-    .setTitle(`Playing : ${searched.items[0].snippet.title}`)
+    .setTitle(`Playing : ${searched.snippet.title}`)
     .setAuthor(user.username, user.avatarURL())
-    .setImage(searched.items[0].snippet.thumbnails.medium.url)
-    .setURL(`https://www.youtube.com/watch?v=${searched.items[0].id.videoId}`)
+    .setImage(searched.snippet.thumbnails.medium.url)
+    .setURL(`https://www.youtube.com/watch?v=${searched.id.videoId}`)
     .setColor("RANDOM");
-  msg.reply({ embeds: [embed] });
+  msg.channel.send({ embeds: [embed] });
 };
+
+const messageSearch = (results: Root, numberOfResults: number, msg: any) => {
+  const user = msg.mentions.users.first() || msg.author;
+  var body: string = "";
+  results.items.forEach((item, index) => {
+    const mappedItem = mapYoutubeSearchToResult(item);
+    body += `${(index+1).toString()} : ${mappedItem.title}\n`;
+  })
+  var embed = new MessageEmbed()
+    .setTitle(`Liste des ${numberOfResults} premiers résultats`)
+    .setAuthor(user.username, user.avatarURL())
+    .setDescription(body)
+    .setColor("RANDOM");
+  msg.channel.send({ embeds: [embed] });
+}
 
 const messageJoinFirst = (msg: any) => {
   const user = msg.mentions.users.first() || msg.author;
@@ -29,4 +46,4 @@ const helpMePls = (msg:any) =>{
   msg.reply({ embeds: [embed] });
 }
 
-export { messagePlaying,messageJoinFirst,helpMePls };
+export { messagePlaying, messageJoinFirst, helpMePls, messageSearch };

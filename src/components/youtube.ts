@@ -1,33 +1,32 @@
+import { baseURL, searchByKeyWord } from "src/const/youtube-api-uri";
+import { Root } from "src/model/youtube/searchData";
 import ytdl from "ytdl-core";
 import axios from "./axios";
-const baseURL = "https://youtube.googleapis.com/youtube/v3";
 
-const youtube = async (msg: any) => {
+const playYoutubeFromCommand = async (msg: any) => {
   let link = msg.content.replace(/!play /g, "").trim();
+  return playYoutubeFromURL(link);
+};
+
+const playYoutubeFromURL = async (link: any) => {
   let info = await ytdl.getInfo(link);
   let format = ytdl.filterFormats(info.formats, "audioonly");
   return format;
-};
+}
 
-const search = async (msg: any) => {
-  let link = msg.content.replace("!play ", "").trim();
-  const uri = `${baseURL}/search?part=snippet&q=${encodeURIComponent(
-    link
-  )}&key=${process.env.YOUTUBE_API}`;
-  // console.log(uri);
+const getSearchResults = async (numberOfResults: number, msg: any): Promise<Root> => {
+  let keyword = msg.content.replace("!play ", "").trim();
+  const uri = searchByKeyWord(numberOfResults, keyword);
+  //console.log(uri)
   const data = await axios.get(uri);
-
   return data.data;
 };
 
 const searchById = async (msg: any) => {
   let link = msg.content.replace("!play ", "").trim();
   link = YouTubeGetID(link);
-  // console.log(`link : ${link}`);
   const uri = `${baseURL}/videos?part=snippet&id=${link}&key=${process.env.YOUTUBE_API}`;
-  // console.log(uri);
   const data = await axios.get(uri);
-
   return data.data;
 };
 
@@ -52,4 +51,4 @@ function YouTubeGetID(url: any) {
   return ID;
 }
 
-export { youtube, search, youtubeBySearch, searchById };
+export { playYoutubeFromURL, playYoutubeFromCommand, getSearchResults, youtubeBySearch, searchById };
