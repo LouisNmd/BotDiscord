@@ -2,6 +2,7 @@ import {
   connection as con,
   client as cli,
   disconnect as dis,
+  skipSound as skip,
   play,
   joinServer,
   playSelectedSound,
@@ -31,6 +32,10 @@ client.on("messageCreate", async (msg: any) => {
 
     case msg.content.indexOf("!play") == 0:
       play(msg);
+      break;
+
+    case msg.content == "!skip":
+      skip(msg);
       break;
 
     case msg.content == "!!help":
