@@ -1,3 +1,4 @@
+import { AudioPlayer } from "@discordjs/voice";
 import { MessageEmbed } from "discord.js";
 import { mapYoutubeSearchToResult } from "src/model/mapper";
 import { Item, Root } from "src/model/youtube/searchData";
@@ -12,6 +13,20 @@ const messagePlaying = (msg: any, searched: Item) => {
     .setColor("RANDOM");
   msg.channel.send({ embeds: [embed] });
 };
+
+const messageSkipping = (msg: any, latestItem: Item) => {
+  const embed = new MessageEmbed()
+    .setTitle(`Skipping : ${latestItem.snippet.title}`)
+    .setColor("RANDOM");
+  msg.channel.send({ embeds: [embed] });
+}
+
+const messageNotSkipping = (msg: any) => {
+  const embed = new MessageEmbed()
+    .setTitle(`There's nothing to skip!`)
+    .setColor("RANDOM");
+  msg.channel.send({ embeds: [embed] });
+}
 
 const messageSearch = (results: Root, numberOfResults: number, msg: any) => {
   const user = msg.mentions.users.first() || msg.author;
@@ -46,4 +61,4 @@ const helpMePls = (msg:any) =>{
   msg.reply({ embeds: [embed] });
 }
 
-export { messagePlaying, messageJoinFirst, helpMePls, messageSearch };
+export { messagePlaying, messageJoinFirst, helpMePls, messageSearch, messageSkipping, messageNotSkipping };
