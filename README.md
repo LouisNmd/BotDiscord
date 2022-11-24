@@ -21,7 +21,7 @@ touch .env
 TOKEN=XXXXXXXXXXXXXXX(discord token)
 YOUTUBE_API=XXXXXXXXXXXXXXX(youtube api v3 token)
 
-# run application
+# start application
 npm start
 </pre>
 
