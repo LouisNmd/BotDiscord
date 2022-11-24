@@ -14,10 +14,10 @@ cd BotDiscord
 # install package
 npm i && npm i -g ts-node
 
-# create file .env
+# create .env file
 touch .env
 
-# in file .env
+# in .env file
 TOKEN=XXXXXXXXXXXXXXX(discord token)
 YOUTUBE_API=XXXXXXXXXXXXXXX(youtube api v3 token)
 
