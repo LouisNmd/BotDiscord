@@ -1,4 +1,4 @@
-# discord-youtube-music-bot (BETA VERSION)
+# discord-youtube-music-bot
 
 Discord youtube music bot make for education!
 
