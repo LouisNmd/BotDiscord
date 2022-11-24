@@ -1,6 +1,6 @@
 # discord-youtube-music-bot (BETA VERSION)
 
-Discord youtube music bot make for education
+Discord youtube music bot make for education!
 
 ## Getting Started
 Note: You already need to have Node js (v16.13.1+) installed.
