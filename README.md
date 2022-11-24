@@ -6,10 +6,10 @@ Discord youtube music bot make for education!
 Note: You already need to have Node js (v16.13.1+) installed!
 <pre>
 # clone the repo
-git clone https://github.com/kai63001/discord-youtube-music-bot
+git clone https://github.com/LouisNmd/BotDiscord.git
 
 # move to the cloned repo
-cd discord-youtube-music-bot
+cd BotDiscord
 
 # install package
 npm i && npm i -g ts-node
