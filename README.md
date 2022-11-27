@@ -28,6 +28,7 @@ npm start
 To deploy, we're using this: https://github.com/olipo186/Git-Auto-Deploy
 
 You only have to setup an ssh key using these:
+
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux
 
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
