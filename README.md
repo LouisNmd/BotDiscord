@@ -33,8 +33,18 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generati
 
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
 
-and then modify ~/.ssh/config:
+and then modify ~/.ssh/config, adding:
 
 IdentityFile ~/.ssh/BotDiscord
 
 ^^^ This should point to the private file you created on the previous step
+
+Then copy the deployment/config.json into the Git-Auto-Deploy directory and add an entry in crontab like:
+
+@reboot cd /src/Git-Auto-Deploy && /usr/bin/python2 -m gitautodeploy --config config.json
+
+You can manually run the Git-Auto-Deploy thingy in the Git-Auto-Deploy directory with:
+
+/usr/bin/python2 -m gitautodeploy --config config.json
+
+
