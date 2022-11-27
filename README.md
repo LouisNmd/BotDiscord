@@ -46,5 +46,3 @@ Then copy the deployment/config.json into the Git-Auto-Deploy directory and add 
 You can manually run the Git-Auto-Deploy thingy in the Git-Auto-Deploy directory with:
 
 /usr/bin/python2 -m gitautodeploy --config config.json
-
-test
