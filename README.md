@@ -47,4 +47,4 @@ You can manually run the Git-Auto-Deploy thingy in the Git-Auto-Deploy directory
 
 /usr/bin/python2 -m gitautodeploy --config config.json
 
-
+test
