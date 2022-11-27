@@ -1,0 +1,15 @@
+{
+  "log-file": "~/gitautodeploy.log",
+  "pid-file": "~/.gitautodeploy.pid",
+  "log-level": "INFO",
+
+  "repositories": [
+    {
+      "url": "git@github.com:LouisNmd/BotDiscord.git",
+      "branch": "main",
+      "remote": "origin",
+      "path": "/src/BotDiscord",
+      "deploy": "bash /src/BotDiscord/deployment/deploy.sh"
+    }
+  ]
+}

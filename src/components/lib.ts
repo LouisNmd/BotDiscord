@@ -12,11 +12,12 @@ import {
   searchById,
   playYoutubeFromCommand,
 } from "@components/youtube";
-import { messagePlaying, messageJoinFirst, messageSearch } from "@components/message";
+import { messagePlaying, messageJoinFirst, messageSearch, messageSkipping, messageNotSkipping } from "@components/message";
 import { Item, Root } from "src/model/youtube/searchData";
 import { videoURL } from "src/const/youtube-api-uri";
 
 let _connection: any;
+let latestItem: Item;
 const player = createAudioPlayer();
 const NUMBER_OF_RESULT = 5;
 var CURRENTLY_SEARCHING = false;
@@ -101,7 +102,8 @@ const play = async (msg: any) => {
       const path = await playYoutubeFromCommand(msg);
       const resource = await createAudioResource(path[1].url);
       player.play(resource);
-      messagePlaying(msg, searched.items[0]); //send message
+      latestItem = searched.items[0]
+      messagePlaying(msg, latestItem); //send message
       const subscribe = _connection.subscribe(player);
     } else {
       // Cas d'une recherche par mot clé
@@ -116,11 +118,11 @@ const play = async (msg: any) => {
 const playSelectedSound = async (msg: any) => {
   const index: number = parseInt(msg.content);
   if(CURRENTLY_SEARCHING &&  index >= 1 && index <= NUMBER_OF_RESULT) {
-    const videoToPlay: Item = RESULTS!.items[index-1];
-    const path = await playYoutubeFromURL(videoURL.concat(videoToPlay.id.videoId));
+    latestItem = RESULTS!.items[index-1];
+    const path = await playYoutubeFromURL(videoURL.concat(latestItem.id.videoId));
     const resource = await createAudioResource(path[1].url);
     player.play(resource);
-    messagePlaying(msg, videoToPlay); //send message
+    messagePlaying(msg, latestItem); //send message
     const subscribe = _connection.subscribe(player);
     RESULTS = undefined;
     CURRENTLY_SEARCHING = false;
@@ -128,4 +130,15 @@ const playSelectedSound = async (msg: any) => {
   return;
 }
 
-export { client, connection, disconnect, franky, play, joinServer, playSelectedSound };
+const skipSound = async (msg: any) => {
+  const statusesAllowingSkip = [AudioPlayerStatus.AutoPaused, AudioPlayerStatus.Buffering, AudioPlayerStatus.Paused,AudioPlayerStatus.Playing];
+  if (player && statusesAllowingSkip.includes(player.state.status) ) {
+    messageSkipping(msg, latestItem);
+    await player.stop();
+  } else {
+    messageNotSkipping(msg);
+  }
+}
+
+
+export { client, connection, disconnect, franky, play, joinServer, playSelectedSound, skipSound };
