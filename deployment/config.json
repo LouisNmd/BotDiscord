@@ -9,7 +9,7 @@
       "branch": "main",
       "remote": "origin",
       "path": "/src/BotDiscord",
-      "deploy": "/src/BotDiscord/deployment/deploy.sh"
+      "deploy": "bash /src/BotDiscord/deployment/deploy.sh"
     }
   ]
 }
