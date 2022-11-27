@@ -33,6 +33,7 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generati
 
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
 
+test
 and then modify ~/.ssh/config, adding:
 
 IdentityFile ~/.ssh/BotDiscord
