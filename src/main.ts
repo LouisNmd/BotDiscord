@@ -2,6 +2,7 @@ import {
   connection as con,
   client as cli,
   disconnect as dis,
+  franky,
   play,
   joinServer,
   playSelectedSound,
@@ -27,6 +28,10 @@ client.on("messageCreate", async (msg: any) => {
 
     case msg.content == "!disconnect":
       dis();
+      break;
+
+    case msg.content == "!franky":
+      franky(msg);
       break;
 
     case msg.content.indexOf("!play") == 0:

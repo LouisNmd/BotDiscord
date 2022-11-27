@@ -57,6 +57,31 @@ const disconnect = () => {
   _connection = undefined;
 };
 
+const franky = async (msg: any) => {
+  if (!msg.member?.voice.channel) {
+    messageJoinFirst(msg);
+    return;
+  } else {
+    if (msg?.guild?.voice?.cannel == undefined) {
+      connection(msg);
+    }
+    const bonjour = await createAudioResource('bonjour.mp3');
+    await player.play(bonjour);
+    const subscribe = _connection.subscribe(player);
+    while (player.state.status != AudioPlayerStatus.Idle) {
+      await new Promise(r => setTimeout(r, 250));
+    }
+    await new Promise(r => setTimeout(r, 2000));
+    const aurevoir = await createAudioResource('aurevoir.mp3');
+    await player.play(aurevoir);
+    while (player.state.status != AudioPlayerStatus.Idle) {
+      await new Promise(r => setTimeout(r, 250));
+    }
+    disconnect();
+  }
+  return;
+}
+
 const play = async (msg: any) => {
   if (!msg.member?.voice.channel) {
     messageJoinFirst(msg);
@@ -103,4 +128,4 @@ const playSelectedSound = async (msg: any) => {
   return;
 }
 
-export { client, connection, disconnect, play, joinServer, playSelectedSound };
+export { client, connection, disconnect, franky, play, joinServer, playSelectedSound };
