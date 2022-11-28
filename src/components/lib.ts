@@ -15,11 +15,11 @@ import {
 import { messagePlaying, messageJoinFirst, messageSearch, messageSkipping, messageNotSkipping } from "@components/message";
 import { Item, Root } from "src/model/youtube/searchData";
 import { videoURL } from "src/const/youtube-api-uri";
+import { config } from "src/const/config";
 
 let _connection: any;
 let latestItem: Item;
 const player = createAudioPlayer();
-const NUMBER_OF_RESULT = 5;
 var CURRENTLY_SEARCHING = false;
 var RESULTS: Root | undefined;
 
@@ -63,7 +63,7 @@ const autoDisconnect = async () => {
   let latestNonIdleTime = Date.now();
   while (_connection) {
     if (player.state.status === AudioPlayerStatus.Idle) {
-      if ((Date.now() - latestNonIdleTime)/1000 >= 60) {
+      if ((Date.now() - latestNonIdleTime)/1000 >= config.AUTO_DISCONNECT_SECONDS) {
         disconnect()
         break;
       }
@@ -123,9 +123,9 @@ const play = async (msg: any) => {
       const subscribe = _connection.subscribe(player);
     } else {
       // Cas d'une recherche par mot clé
-      RESULTS = await getSearchResults(NUMBER_OF_RESULT, msg);
+      RESULTS = await getSearchResults(config.NUMBER_OF_RESULTS, msg);
       CURRENTLY_SEARCHING = true;
-      messageSearch(RESULTS, NUMBER_OF_RESULT, msg);
+      messageSearch(RESULTS, config.NUMBER_OF_RESULTS, msg);
     }
   }
   return;
@@ -133,7 +133,7 @@ const play = async (msg: any) => {
 
 const playSelectedSound = async (msg: any) => {
   const index: number = parseInt(msg.content);
-  if(CURRENTLY_SEARCHING &&  index >= 1 && index <= NUMBER_OF_RESULT) {
+  if(CURRENTLY_SEARCHING &&  index >= 1 && index <= config.NUMBER_OF_RESULTS) {
     latestItem = RESULTS!.items[index-1];
     const path = await playYoutubeFromURL(videoURL.concat(latestItem.id.videoId));
     const resource = await createAudioResource(path[1].url);
