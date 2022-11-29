@@ -105,12 +105,20 @@ const play = async (msg: any) => {
     return;
   } else {
     if (msg.content.replace(/!play/g, "").trim().length == 0) {
-      msg.reply("!help");
-      return;
+      if (player.state.status === AudioPlayerStatus.Paused) {
+        player.unpause();
+        msg.react('▶️')
+        return;
+      } else {
+        msg.reply("!help");
+        return;
+      }
     }
-    if (msg?.guild?.voice?.cannel == undefined) {
+
+    if (msg?.guild?.voice?.channel == undefined) {
       connection(msg);
     }
+
     if (msg.content.indexOf("youtube.com") >= 0) {
       // Cas d'une recherche par URL
       const searched = await searchById(msg);
@@ -131,6 +139,16 @@ const play = async (msg: any) => {
   return;
 };
 
+const pause = (msg: any) => {
+  if (!msg.member?.voice.channel) {
+    messageJoinFirst(msg);
+    return;
+  } else if(player.state.status === AudioPlayerStatus.Playing || player.state.status === AudioPlayerStatus.Buffering) {
+    player.pause();
+    msg.react('⏸️');
+  }
+}
+
 const playSelectedSound = async (msg: any) => {
   const index: number = parseInt(msg.content);
   if(CURRENTLY_SEARCHING &&  index >= 1 && index <= config.NUMBER_OF_RESULTS) {
@@ -150,11 +168,11 @@ const skipSound = async (msg: any) => {
   const statusesAllowingSkip = [AudioPlayerStatus.AutoPaused, AudioPlayerStatus.Buffering, AudioPlayerStatus.Paused,AudioPlayerStatus.Playing];
   if (player && statusesAllowingSkip.includes(player.state.status) ) {
     messageSkipping(msg, latestItem);
-    await player.stop();
+    await player.stop(true);
   } else {
     messageNotSkipping(msg);
   }
 }
 
 
-export { client, connection, disconnect, franky, play, joinServer, playSelectedSound, skipSound };
+export { client, connection, disconnect, franky, play, pause, joinServer, playSelectedSound, skipSound };

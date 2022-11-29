@@ -5,6 +5,7 @@ import {
   franky,
   skipSound as skip,
   play,
+  pause,
   joinServer,
   playSelectedSound,
 } from "@components/lib";
@@ -37,6 +38,10 @@ client.on("messageCreate", async (msg: any) => {
 
     case msg.content.indexOf("!play") == 0:
       play(msg);
+      break;
+
+    case msg.content == "!pause":
+      pause(msg);
       break;
 
     case msg.content == "!skip":
