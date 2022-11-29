@@ -41,6 +41,7 @@ const connection = (msg: any) => {
     // @ts-ignore: Unreachable code error
     adapterCreator: msg.channel.guild.voiceAdapterCreator,
   });
+  autoDisconnect();
 };
 
 const joinServer = (msg: any) => {
@@ -57,6 +58,21 @@ const disconnect = () => {
   _connection.destroy();
   _connection = undefined;
 };
+
+const autoDisconnect = async () => {
+  let latestNonIdleTime = Date.now();
+  while (_connection) {
+    if (player.state.status === AudioPlayerStatus.Idle) {
+      if ((Date.now() - latestNonIdleTime)/1000 >= 60) {
+        disconnect()
+        break;
+      }
+    } else {
+      latestNonIdleTime = Date.now();
+    }
+    await new Promise(r => setTimeout(r, 5000));
+  }
+}
 
 const franky = async (msg: any) => {
   if (!msg.member?.voice.channel) {
