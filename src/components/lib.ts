@@ -89,12 +89,20 @@ const play = async (msg: any) => {
     return;
   } else {
     if (msg.content.replace(/!play/g, "").trim().length == 0) {
-      msg.reply("!help");
-      return;
+      if (player.state.status === AudioPlayerStatus.Paused) {
+        player.unpause();
+        msg.react('▶️')
+        return;
+      } else {
+        msg.reply("!help");
+        return;
+      }
     }
-    if (msg?.guild?.voice?.cannel == undefined) {
+
+    if (msg?.guild?.voice?.channel == undefined) {
       connection(msg);
     }
+
     if (msg.content.indexOf("youtube.com") >= 0) {
       // Cas d'une recherche par URL
       const searched = await searchById(msg);
@@ -114,6 +122,16 @@ const play = async (msg: any) => {
   }
   return;
 };
+
+const pause = (msg: any) => {
+  if (!msg.member?.voice.channel) {
+    messageJoinFirst(msg);
+    return;
+  } else {
+    player.pause();
+    msg.react('⏸️');
+  }
+}
 
 const playSelectedSound = async (msg: any) => {
   const index: number = parseInt(msg.content);
@@ -141,4 +159,4 @@ const skipSound = async (msg: any) => {
 }
 
 
-export { client, connection, disconnect, franky, play, joinServer, playSelectedSound, skipSound };
+export { client, connection, disconnect, franky, play, pause, joinServer, playSelectedSound, skipSound };
