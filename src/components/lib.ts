@@ -127,7 +127,7 @@ const pause = (msg: any) => {
   if (!msg.member?.voice.channel) {
     messageJoinFirst(msg);
     return;
-  } else {
+  } else if(player.state.status === AudioPlayerStatus.Playing || player.state.status === AudioPlayerStatus.Buffering) {
     player.pause();
     msg.react('⏸️');
   }
@@ -152,7 +152,7 @@ const skipSound = async (msg: any) => {
   const statusesAllowingSkip = [AudioPlayerStatus.AutoPaused, AudioPlayerStatus.Buffering, AudioPlayerStatus.Paused,AudioPlayerStatus.Playing];
   if (player && statusesAllowingSkip.includes(player.state.status) ) {
     messageSkipping(msg, latestItem);
-    await player.stop();
+    await player.stop(true);
   } else {
     messageNotSkipping(msg);
   }
