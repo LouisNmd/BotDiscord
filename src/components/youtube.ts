@@ -1,7 +1,7 @@
 import { baseURL, searchByKeyWord } from "src/const/youtube-api-uri";
 import { Root } from "src/model/youtube/searchData";
 import ytdl from "ytdl-core";
-import axios from "./axios";
+import axios from "axios";
 
 const playYoutubeFromCommand = async (msg: any) => {
   let link = msg.content.replace(/!play /g, "").trim();
@@ -12,12 +12,11 @@ const playYoutubeFromURL = async (link: any) => {
   let info = await ytdl.getInfo(link);
   let format = ytdl.filterFormats(info.formats, "audioonly");
   return format;
-}
+};
 
 const getSearchResults = async (numberOfResults: number, msg: any): Promise<Root> => {
   let keyword = msg.content.replace("!play ", "").trim();
   const uri = searchByKeyWord(numberOfResults, keyword);
-  //console.log(uri)
   const data = await axios.get(uri);
   return data.data;
 };
@@ -49,6 +48,6 @@ function YouTubeGetID(url: any) {
     ID = url;
   }
   return ID;
-}
+};
 
 export { playYoutubeFromURL, playYoutubeFromCommand, getSearchResults, youtubeBySearch, searchById };

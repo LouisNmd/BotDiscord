@@ -1,25 +1,25 @@
 import {
-  connection as con,
-  client as cli,
-  disconnect as dis,
+  client as newClient,
+  disconnect,
   franky,
-  skipSound as skip,
+  skipSound,
   play,
   pause,
   joinServer,
   playSelectedSound,
+  feur,
 } from "@components/lib";
-import {helpMePls} from "@components/message"
+import { helpMePls } from "@components/message";
+import { addSpeechEvent } from "discord-speech-recognition";
 require("dotenv").config();
 
-const client = cli();
+const client = newClient();
+addSpeechEvent(client, {lang: "fr-FR"});
 
 client.once("ready", () => {
   console.log("ready");
   // @ts-ignore: Unreachable code error
-  client.user.setActivity("MUSIC | !help", {
-    type: "PLAYING",
-  });
+  client.user.setActivity("MUSIC | !help", { type: "PLAYING" } );
 });
 
 client.on("messageCreate", async (msg: any) => {
@@ -29,7 +29,7 @@ client.on("messageCreate", async (msg: any) => {
       break;
 
     case msg.content == "!disconnect":
-      dis();
+      disconnect();
       break;
 
     case msg.content == "!franky":
@@ -45,7 +45,7 @@ client.on("messageCreate", async (msg: any) => {
       break;
 
     case msg.content == "!skip":
-      skip(msg);
+      skipSound(msg);
       break;
 
     case msg.content == "!!help":
@@ -60,5 +60,15 @@ client.on("messageCreate", async (msg: any) => {
       break;
   }
 });
+
+client.on("speech", (msg) => {
+  if (!msg.content) {
+    return;
+  }
+  const messageArray = msg.content.split(" ");
+  if (messageArray.slice(-5, messageArray.length).includes("quoi")) {
+    feur();
+  }
+})
 
 client.login(process.env.TOKEN);
