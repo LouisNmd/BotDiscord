@@ -3,33 +3,42 @@ import {
   createAudioPlayer,
   createAudioResource,
   joinVoiceChannel,
+  StreamType,
 } from "@discordjs/voice";
-import { Client, Intents, MessageEmbed } from "discord.js";
+import { Client, GatewayIntentBits } from "discord.js";
 import {
   playYoutubeFromURL,
   getSearchResults,
-  youtubeBySearch,
   searchById,
   playYoutubeFromCommand,
 } from "@components/youtube";
-import { messagePlaying, messageJoinFirst, messageSearch, messageSkipping, messageNotSkipping } from "@components/message";
+import { 
+  messagePlaying,
+  messageJoinFirst,
+  messageSearch,
+  messageSkipping,
+  messageNotSkipping,
+} from "@components/message";
 import { Item, Root } from "src/model/youtube/searchData";
 import { videoURL } from "src/const/youtube-api-uri";
 import { config } from "src/const/config";
 
+const player = createAudioPlayer();
+
 let _connection: any;
 let latestItem: Item;
-const player = createAudioPlayer();
-var CURRENTLY_SEARCHING = false;
-var RESULTS: Root | undefined;
+let latestNonIdleTime = Date.now();
+let CURRENTLY_SEARCHING = false;
+let RESULTS: Root | undefined;
 
 const client = () => {
   return new Client({
     intents: [
-      Intents.FLAGS.GUILDS,
-      Intents.FLAGS.GUILD_MEMBERS,
-      Intents.FLAGS.GUILD_MESSAGES,
-      Intents.FLAGS.GUILD_VOICE_STATES,
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMembers,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.GuildVoiceStates,
+      GatewayIntentBits.MessageContent,
     ],
   });
 };
@@ -60,19 +69,18 @@ const disconnect = () => {
 };
 
 const autoDisconnect = async () => {
-  let latestNonIdleTime = Date.now();
-  while (_connection) {
+  while (_connection && _connection != undefined) {
     if (player.state.status === AudioPlayerStatus.Idle) {
       if ((Date.now() - latestNonIdleTime)/1000 >= config.AUTO_DISCONNECT_SECONDS) {
-        disconnect()
+        disconnect();
         break;
       }
     } else {
       latestNonIdleTime = Date.now();
-    }
-    await new Promise(r => setTimeout(r, 5000));
-  }
-}
+    };
+    await new Promise(r => setTimeout(r, 100));
+  };
+};
 
 const franky = async (msg: any) => {
   if (!msg.member?.voice.channel) {
@@ -81,21 +89,21 @@ const franky = async (msg: any) => {
   } else {
     if (msg?.guild?.voice?.cannel == undefined) {
       connection(msg);
-    }
+    };
     const bonjour = await createAudioResource('bonjour.mp3');
     await player.play(bonjour);
-    const subscribe = _connection.subscribe(player);
+    _connection.subscribe(player);
     while (player.state.status != AudioPlayerStatus.Idle) {
       await new Promise(r => setTimeout(r, 250));
-    }
+    };
     await new Promise(r => setTimeout(r, 2000));
     const aurevoir = await createAudioResource('aurevoir.mp3');
     await player.play(aurevoir);
     while (player.state.status != AudioPlayerStatus.Idle) {
       await new Promise(r => setTimeout(r, 250));
-    }
+    };
     disconnect();
-  }
+  };
   return;
 }
 
@@ -103,39 +111,35 @@ const play = async (msg: any) => {
   if (!msg.member?.voice.channel) {
     messageJoinFirst(msg);
     return;
-  } else {
-    if (msg.content.replace(/!play/g, "").trim().length == 0) {
-      if (player.state.status === AudioPlayerStatus.Paused) {
-        player.unpause();
-        msg.react('▶️')
-        return;
-      } else {
-        msg.reply("!help");
-        return;
-      }
-    }
-
-    if (msg?.guild?.voice?.channel == undefined) {
-      connection(msg);
-    }
-
-    if (msg.content.indexOf("youtube.com") >= 0) {
-      // Cas d'une recherche par URL
-      const searched = await searchById(msg);
-      //console.log(searched);
-      const path = await playYoutubeFromCommand(msg);
-      const resource = await createAudioResource(path[1].url);
-      player.play(resource);
-      latestItem = searched.items[0]
-      messagePlaying(msg, latestItem); //send message
-      const subscribe = _connection.subscribe(player);
+  };
+  if (msg.content.replace(/!play/g, "").trim().length == 0) {
+    if (player.state.status === AudioPlayerStatus.Paused) {
+      player.unpause();
+      msg.react('▶️');
+      return;
     } else {
-      // Cas d'une recherche par mot clé
-      RESULTS = await getSearchResults(config.NUMBER_OF_RESULTS, msg);
-      CURRENTLY_SEARCHING = true;
-      messageSearch(RESULTS, config.NUMBER_OF_RESULTS, msg);
-    }
-  }
+      msg.reply("!help");
+      return;
+    };
+  };
+  if (msg?.guild?.voice?.channel == undefined) {
+    connection(msg);
+  };
+  if (msg.content.indexOf("youtube.com") >= 0 || msg.content.indexOf("youtu.be") >= 0) {
+    // Cas d'une recherche par URL
+    const searched = await searchById(msg);
+    const path = await playYoutubeFromCommand(msg);
+    const resource = await createAudioResource(path[1].url);
+    player.play(resource);
+    latestItem = searched.items[0];
+    messagePlaying(msg, latestItem);
+    _connection.subscribe(player);
+  } else {
+    // Cas d'une recherche par mot clé
+    RESULTS = await getSearchResults(config.NUMBER_OF_RESULTS, msg);
+    CURRENTLY_SEARCHING = true;
+    messageSearch(RESULTS, config.NUMBER_OF_RESULTS, msg);
+  };
   return;
 };
 
@@ -146,8 +150,8 @@ const pause = (msg: any) => {
   } else if(player.state.status === AudioPlayerStatus.Playing || player.state.status === AudioPlayerStatus.Buffering) {
     player.pause();
     msg.react('⏸️');
-  }
-}
+  };
+};
 
 const playSelectedSound = async (msg: any) => {
   const index: number = parseInt(msg.content);
@@ -156,13 +160,13 @@ const playSelectedSound = async (msg: any) => {
     const path = await playYoutubeFromURL(videoURL.concat(latestItem.id.videoId));
     const resource = await createAudioResource(path[1].url);
     player.play(resource);
-    messagePlaying(msg, latestItem); //send message
-    const subscribe = _connection.subscribe(player);
+    messagePlaying(msg, latestItem);
+    _connection.subscribe(player);
     RESULTS = undefined;
     CURRENTLY_SEARCHING = false;
-  }
+  };
   return;
-}
+};
 
 const skipSound = async (msg: any) => {
   const statusesAllowingSkip = [AudioPlayerStatus.AutoPaused, AudioPlayerStatus.Buffering, AudioPlayerStatus.Paused,AudioPlayerStatus.Playing];
@@ -171,8 +175,22 @@ const skipSound = async (msg: any) => {
     await player.stop(true);
   } else {
     messageNotSkipping(msg);
-  }
-}
+  };
+};
+
+const feur = async () => {
+  latestNonIdleTime = Date.now();
+  player.pause();
+  const feurPlayer = createAudioPlayer();
+  _connection.subscribe(feurPlayer);
+  const feur = await createAudioResource("feur.mp3");
+  await feurPlayer.play(feur);
+  while (feurPlayer.state.status != AudioPlayerStatus.Idle) {
+    await new Promise(r => setTimeout(r, 250));
+  };
+  _connection.subscribe(player);
+  player.unpause();
+};
 
 
-export { client, connection, disconnect, franky, play, pause, joinServer, playSelectedSound, skipSound };
+export { client, connection, disconnect, franky, play, pause, joinServer, playSelectedSound, skipSound, feur };
