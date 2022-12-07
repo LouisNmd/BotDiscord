@@ -27,7 +27,7 @@ const player = createAudioPlayer();
 
 let _connection: any;
 let latestItem: Item;
-let latestNonIdleTime = Date.now();
+let latestNonIdleTime: number;
 let CURRENTLY_SEARCHING = false;
 let RESULTS: Root | undefined;
 
@@ -69,6 +69,7 @@ const disconnect = () => {
 };
 
 const autoDisconnect = async () => {
+  latestNonIdleTime = Date.now();
   while (_connection && _connection != undefined) {
     if (player.state.status === AudioPlayerStatus.Idle) {
       if ((Date.now() - latestNonIdleTime)/1000 >= config.AUTO_DISCONNECT_SECONDS) {
