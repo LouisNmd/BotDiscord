@@ -1,6 +1,6 @@
 import { baseURL, searchByKeyWord } from "src/const/youtube-api-uri";
 import { Root } from "src/model/youtube/searchData";
-import ytdl from "ytdl-core";
+import playdl from "play-dl";
 import axios from "axios";
 
 const playYoutubeFromCommand = async (msg: any) => {
@@ -9,9 +9,8 @@ const playYoutubeFromCommand = async (msg: any) => {
 };
 
 const playYoutubeFromURL = async (link: any) => {
-  let info = await ytdl.getInfo(link);
-  let format = ytdl.filterFormats(info.formats, "audioonly");
-  return format;
+  let stream = await playdl.stream(link);
+  return stream;
 };
 
 const getSearchResults = async (numberOfResults: number, msg: any): Promise<Root> => {
@@ -31,9 +30,8 @@ const searchById = async (msg: any) => {
 
 const youtubeBySearch = async (data: string) => {
   let link = data.trim();
-  let info = await ytdl.getInfo(link);
-  let format = ytdl.filterFormats(info.formats, "audioonly");
-  return format;
+  let info = await playdl.search(link);
+  return info;
 };
 
 function YouTubeGetID(url: any) {
