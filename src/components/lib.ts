@@ -129,8 +129,10 @@ const play = async (msg: any) => {
   if (msg.content.indexOf("youtube.com") >= 0 || msg.content.indexOf("youtu.be") >= 0) {
     // Cas d'une recherche par URL
     const searched = await searchById(msg);
-    const path = await playYoutubeFromCommand(msg);
-    const resource = await createAudioResource(path[1].url);
+    const stream = await playYoutubeFromCommand(msg);
+    const resource = await createAudioResource(stream.stream, {
+      inputType: stream.type
+    });
     player.play(resource);
     latestItem = searched.items[0];
     messagePlaying(msg, latestItem);
@@ -158,8 +160,10 @@ const playSelectedSound = async (msg: any) => {
   const index: number = parseInt(msg.content);
   if(CURRENTLY_SEARCHING &&  index >= 1 && index <= config.NUMBER_OF_RESULTS) {
     latestItem = RESULTS!.items[index-1];
-    const path = await playYoutubeFromURL(videoURL.concat(latestItem.id.videoId));
-    const resource = await createAudioResource(path[1].url);
+    const stream = await playYoutubeFromURL(videoURL.concat(latestItem.id.videoId));
+    const resource = await createAudioResource(stream.stream, { 
+      inputType: stream.type
+    });
     player.play(resource);
     messagePlaying(msg, latestItem);
     _connection.subscribe(player);
